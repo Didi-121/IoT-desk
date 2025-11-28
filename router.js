@@ -12,5 +12,8 @@ router.get(constants.contextURL + constants.api + constants.getTimerData, sensor
 router.post(constants.contextURL + constants.api + constants.postButtonData, sensors.insertButtonData);
 router.get(constants.contextURL + constants.api + constants.getButtonData, sensors.getButtonData);
 
+router.post(constants.contextURL + constants.api + constants.postTemperatureData, sensors.insertTemperatureData);
+router.get(constants.contextURL + constants.api + constants.getTemperatureData, sensors.getTemperatureData);
+
 // export the router
 module.exports = router;

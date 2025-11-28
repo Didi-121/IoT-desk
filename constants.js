@@ -2,9 +2,9 @@
 const dbHost = "localhost";
 const dbPort = "3306";
 const dbUser = "root";
-const dbPass = "@12qwwq21";
+const dbPass = "M@rbell@1124";
 // Use the 'desktop' database for IoT desktop storage
-const dbName = "desktop";
+const dbName = "iot";
 
 //Server General Configuration
 const serverPort = 3000 
@@ -20,6 +20,10 @@ const getTimerData = '/timer/data';
 const postButtonData = '/button/data';
 const getButtonData = '/button/data';
 
+//DH11 Temperature endpoint
+const postTemperatureData = '/temperature/data';
+const getTemperatureData = '/temperature/data';
+
 // TIMER QUERIES
 const insertTimerTime = 'INSERT INTO timer (minutes, seconds, date) VALUES (?, ?, NOW())';
 const selectTimerData = 'SELECT * FROM timer';
@@ -28,10 +32,16 @@ const selectTimerData = 'SELECT * FROM timer';
 const insertButtonState = 'INSERT INTO button (state, date) VALUES (?, NOW())';
 const selectButtonData = 'SELECT * FROM button';
 
+// TEMPERATURE QUERIES
+const insertTemperatureData ='INSERT INTO temperatura (valor, estado) VALUES (?, ?)';
+const selectTemperatureData = 'SELECT * FROM temperature';
+
 module.exports= {
    dbHost,dbPort,dbUser,dbPass,dbName,serverPort, contextURL,api,
    postTimerData, getTimerData,
    postButtonData, getButtonData,
+   postTemperatureData, getTemperatureData,
    insertTimerTime, selectTimerData,
-   insertButtonState, selectButtonData
+   insertButtonState, selectButtonData,
+   insertTemperatureData, selectTemperatureData
 }
