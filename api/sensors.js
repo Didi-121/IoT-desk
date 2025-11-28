@@ -85,4 +85,41 @@ async function getButtonData(req, res) {
     }
 }
 
-module.exports = { insertTimeData, insertButtonData, getTimerData, getButtonData };
+//Endpoint 5: recibe datos del DH11
+async function insertTemperatureData(req, res){
+    try{
+        const serverTime = new Date().toISOString();
+        console.log(`[TEMPERATURE_DATA] Received at ${serverTime}`);
+        console.log(' Payload:', req.body);
+
+        if (!req.body || req.body.temperature === undefined) {
+            return res.status(400).json({ error: "Missing temperature" });
+        }
+
+        let query = constants.insertTemperatureData;
+        let params = [req.body.temperature];
+
+        const qResult = await mysql.insertData(query, params);
+        res.status(200).json(qResult);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({status: "error", message: error.message});
+    }
+}
+
+//Endpoint 6: obtiene datos del DH11
+async function getTemperatureData(req, res){
+    try{
+        const serverTime = new Date().toISOString();
+        console.log(`[GET_TEMPERATURE_DATA] Requested at ${serverTime}`);
+
+        let query = constants.selectTemperatureData;
+        const qResult = await mysql.queryData(query, []);
+        res.status(200).json(qResult);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({status: "error", message: error.message});
+    }
+}
+
+module.exports = { insertTimeData, insertButtonData, getTimerData, getButtonData, insertTemperatureData, getTemperatureData };
