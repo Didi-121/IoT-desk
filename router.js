@@ -15,5 +15,13 @@ router.get(constants.contextURL + constants.api + constants.getButtonData, senso
 router.post(constants.contextURL + constants.api + constants.postTemperatureData, sensors.insertTemperatureData);
 router.get(constants.contextURL + constants.api + constants.getTemperatureData, sensors.getTemperatureData);
 
+// LIGHT
+router.post(constants.contextURL + constants.api + constants.postLightData, sensors.insertLightData);
+router.get(constants.contextURL + constants.api + constants.getLightData, sensors.getLightData);
+
+// DISTANCE
+router.post(constants.contextURL + constants.api + constants.postDistanceData, sensors.insertDistanceData);
+router.get(constants.contextURL + constants.api + constants.getDistanceData, sensors.getDistanceData);
+
 // export the router
 module.exports = router;

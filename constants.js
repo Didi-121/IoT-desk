@@ -24,6 +24,14 @@ const getButtonData = '/button/data';
 const postTemperatureData = '/temperature/data';
 const getTemperatureData = '/temperature/data';
 
+// Light endpoints
+const postLightData = '/light/data';
+const getLightData = '/light/data';
+
+// Distance endpoints
+const postDistanceData = '/distance/data';
+const getDistanceData = '/distance/data';
+
 // TIMER QUERIES
 const insertTimerTime = 'INSERT INTO timer (minutes, seconds, date) VALUES (?, ?, NOW())';
 const selectTimerData = 'SELECT * FROM timer';
@@ -36,12 +44,24 @@ const selectButtonData = 'SELECT * FROM button';
 const insertTemperatureData ='INSERT INTO temperatura (valor, estado) VALUES (?, ?)';
 const selectTemperatureData = 'SELECT * FROM temperature';
 
+// LIGHT QUERIES
+const insertLightValue = 'INSERT INTO light (value, date) VALUES (?, NOW())';
+const selectLightData = 'SELECT * FROM light';
+
+// DISTANCE QUERIES
+const insertDistanceValue = 'INSERT INTO distance (value, date) VALUES (?, NOW())';
+const selectDistanceData = 'SELECT * FROM distance';
+
 module.exports= {
    dbHost,dbPort,dbUser,dbPass,dbName,serverPort, contextURL,api,
    postTimerData, getTimerData,
    postButtonData, getButtonData,
    postTemperatureData, getTemperatureData,
+   postLightData, getLightData,
+   postDistanceData, getDistanceData,
    insertTimerTime, selectTimerData,
    insertButtonState, selectButtonData,
-   insertTemperatureData, selectTemperatureData
+   insertTemperatureDoata, selectTemperatureData,
+   insertLightValue, selectLightData,
+   insertDistanceValue, selectDistanceData
 }

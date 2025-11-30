@@ -126,4 +126,86 @@ async function getTemperatureData(req, res){
     }
 }
 
-module.exports = { insertTimeData, insertButtonData, getTimerData, getButtonData, insertTemperatureData, getTemperatureData };
+// 
+// LIGHT SENSOR
+// 
+async function insertLightData(req, res) {
+    try {
+        const serverTime = new Date().toISOString();
+        console.log(`[LIGHT_DATA] Received at ${serverTime}`);
+        console.log(' Payload:', req.body);
+
+        if (req.body.value === undefined) {
+            return res.status(400).json({ error: "Missing value" });
+        }
+
+        let query = constants.insertLightValue;
+        let params = [req.body.value];
+
+        const qResult = await mysql.insertData(query, params);
+        res.status(200).json(qResult);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: "error", message: error.message });
+    }
+}
+
+async function getLightData(req, res) {
+    try {
+        console.log(`[GET_LIGHT_DATA] Requested at ${new Date().toISOString()}`);
+
+        let query = constants.selectLightData;
+        const qResult = await mysql.queryData(query, []);
+        res.status(200).json(qResult);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: "error", message: error.message });
+    }
+}
+
+// 
+// DISTANCE SENSOR
+// 
+
+async function insertDistanceData(req, res) {
+    try {
+        const serverTime = new Date().toISOString();
+        console.log(`[DISTANCE_DATA] Received at ${serverTime}`);
+        console.log(' Payload:', req.body);
+
+        if (req.body.value === undefined) {
+            return res.status(400).json({ error: "Missing value" });
+        }
+
+        let query = constants.insertDistanceValue;
+        let params = [req.body.value];
+
+        const qResult = await mysql.insertData(query, params);
+        res.status(200).json(qResult);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: "error", message: error.message });
+    }
+}
+
+async function getDistanceData(req, res) {
+    try {
+        console.log(`[GET_DISTANCE_DATA] Requested at ${new Date().toISOString()}`);
+
+        let query = constants.selectDistanceData;
+        const qResult = await mysql.queryData(query, []);
+        res.status(200).json(qResult);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: "error", message: error.message });
+    }
+}
+
+module.exports = { insertTimeData, insertButtonData, getTimerData, getButtonData, insertTemperatureData, getTemperatureData,
+    insertLightData, getLightData,
+    insertDistanceData, getDistanceData
+};
