@@ -42,12 +42,12 @@ const insertTemperatureData ='INSERT INTO temperatura (valor, estado) VALUES (?,
 const selectTemperatureData = 'SELECT * FROM temperature';
 
 // LIGHT QUERIES
-const insertLightValue = 'INSERT INTO light (value, date) VALUES (?, NOW())';
-const selectLightData = 'SELECT * FROM light';
+const insertLightValue = 'INSERT INTO light (value, state) VALUES (?, ?)';
+const selectLightData = 'SELECT * FROM light ORDER BY id DESC';
 
 // DISTANCE QUERIES
-const insertDistanceValue = 'INSERT INTO distance (value, date) VALUES (?, NOW())';
-const selectDistanceData = 'SELECT * FROM distance';
+const insertDistanceValue = 'INSERT INTO distance (value, state) VALUES (?, ?)';
+const selectDistanceData = 'SELECT * FROM distance ORDER BY id DESC';
 
 module.exports= {
    dbHost,dbPort,dbUser,dbPass,dbName,serverPort, contextURL,api,
