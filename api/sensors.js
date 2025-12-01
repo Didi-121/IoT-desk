@@ -126,24 +126,26 @@ async function getTemperatureData(req, res){
     }
 }
 
-// 
+//
 // LIGHT SENSOR
-// 
+//
 async function insertLightData(req, res) {
     try {
         const serverTime = new Date().toISOString();
         console.log(`[LIGHT_DATA] Received at ${serverTime}`);
         console.log(' Payload:', req.body);
 
-        if (req.body.value === undefined) {
-            return res.status(400).json({ error: "Missing value" });
+        const { value, state } = req.body;
+
+        if (value === undefined || state === undefined) {
+            return res.status(400).json({ error: "Missing value or state" });
         }
 
         let query = constants.insertLightValue;
-        let params = [req.body.value];
+        let params = [value, state];
 
         const qResult = await mysql.insertData(query, params);
-        res.status(200).json(qResult);
+        res.status(200).json({ status: "ok", insert: qResult });
 
     } catch (error) {
         console.error(error);
@@ -165,25 +167,26 @@ async function getLightData(req, res) {
     }
 }
 
-// 
+//
 // DISTANCE SENSOR
-// 
-
+//
 async function insertDistanceData(req, res) {
     try {
         const serverTime = new Date().toISOString();
         console.log(`[DISTANCE_DATA] Received at ${serverTime}`);
         console.log(' Payload:', req.body);
 
-        if (req.body.value === undefined) {
-            return res.status(400).json({ error: "Missing value" });
+        const { value, state } = req.body;
+
+        if (value === undefined || state === undefined) {
+            return res.status(400).json({ error: "Missing value or state" });
         }
 
         let query = constants.insertDistanceValue;
-        let params = [req.body.value];
+        let params = [value, state];
 
         const qResult = await mysql.insertData(query, params);
-        res.status(200).json(qResult);
+        res.status(200).json({ status: "ok", insert: qResult });
 
     } catch (error) {
         console.error(error);
