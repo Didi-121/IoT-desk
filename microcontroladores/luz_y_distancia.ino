@@ -1,34 +1,42 @@
 #include <ESP8266WiFi.h>
 
-// ----------- CONFIG WI-FI -----------
+// =======================
+// CONFIG WI-FI
+// =======================
 const char* ssid = "emilio";
 const char* password = "12345678";
 
 const char* serverHost = "172.20.10.3"; 
 const int serverPort = 3000;
 
-// ----------- ULTRASONICO ----------
-#define TRIG_PIN D5
-#define ECHO_PIN D6
-
-// ----------- FOTORESISTENCIA ----------
+// =======================
+//      LDR + LED NORMAL
+// =======================
 const int ldrPin = A0;
-int thresholdLuz = 300;   // Ajusta según tu ambiente
+const int led = D1;
+int thresholdValue = 100;
+bool lastOscuro = false;
 
-// ----------- LEDS ----------
-#define RED_LED   D3
-#define GREEN_LED D1
-#define LED_TEST  D2
-#define BLUE_LED  D7   // Indicador de oscuridad
+// =======================
+//      LED RGB
+// =======================
+#define RED_LED   D4
+#define GREEN_LED D2
+#define BLUE_LED  D3
 
-// ----------- ESTADOS ANTERIORES ----------
-bool lastOscuro = false;     // Detectar cambios luz→oscuro / oscuro→luz
-String lastLedDist = "ninguno";
+String lastDistState = "none";
 
-// =========================================================
-// ENVÍO DE JSON
-// =========================================================
-void sendJSON(float dist, int luz, bool oscuro, String ledDist) {
+// =======================
+//     ULTRASONICO
+// =======================
+#define TRIG D5
+#define ECHO D6
+
+
+// =======================
+//   WiFi + HTTP JSON
+// =======================
+void sendToServer(String endpoint, String json) {
   WiFiClient client;
 
   if (!client.connect(serverHost, serverPort)) {
@@ -36,15 +44,7 @@ void sendJSON(float dist, int luz, bool oscuro, String ledDist) {
     return;
   }
 
-  String json = "{";
-  json += "\"distancia_cm\": " + String(dist, 1) + ",";
-  json += "\"luz_raw\": " + String(luz) + ",";
-  json += "\"oscuro\": " + String(oscuro ? "true" : "false") + ",";
-  json += "\"led_distancia\": \"" + ledDist + "\",";
-  json += "\"led_luz\": " + String(oscuro ? "true" : "false");
-  json += "}";
-
-  client.println("POST /data HTTP/1.1");
+  client.println("POST " + endpoint + " HTTP/1.1");
   client.print("Host: ");
   client.println(serverHost);
   client.println("Content-Type: application/json");
@@ -53,100 +53,118 @@ void sendJSON(float dist, int luz, bool oscuro, String ledDist) {
   client.println();
   client.print(json);
 
-  Serial.println("📤 Evento enviado al servidor:");
-  Serial.println(json);
-  Serial.println();
+  Serial.println("📤 Enviado a " + endpoint + ": " + json);
   client.stop();
 }
 
-// =========================================================
-// SETUP
-// =========================================================
+
+// =======================
+//         SETUP
+// =======================
 void setup() {
   Serial.begin(115200);
+  delay(2000);
 
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT);
+  pinMode(ldrPin, INPUT);
+  pinMode(led, OUTPUT);
 
   pinMode(RED_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
-  pinMode(LED_TEST, OUTPUT);
   pinMode(BLUE_LED, OUTPUT);
-
-  pinMode(ldrPin, INPUT);
 
   digitalWrite(RED_LED, LOW);
   digitalWrite(GREEN_LED, LOW);
-  digitalWrite(BLUE_LED, HIGH); // apagado (activo en LOW)
-  digitalWrite(LED_TEST, LOW);
+  digitalWrite(BLUE_LED, LOW);
+
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+
+  Serial.println("=== SISTEMA INICIADO ===");
 
   Serial.println("\nConectando a WiFi...");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(400);
     Serial.print(".");
+    delay(400);
   }
-
   Serial.println("\nWiFi conectado!");
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
 }
 
-// =========================================================
-// LOOP PRINCIPAL
-// =========================================================
+
+
+// =======================
+//          LOOP
+// =======================
 void loop() {
 
-  // ----------- MEDIR DISTANCIA -----------
-  digitalWrite(TRIG_PIN, LOW);
-  delayMicroseconds(2);
-  digitalWrite(TRIG_PIN, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(TRIG_PIN, LOW);
-
-  long duration = pulseIn(ECHO_PIN, HIGH, 30000UL);
-  float dist = (duration == 0) ? -1 : (duration * 0.034f) / 2.0f;
-
-  // ----------- MEDIR LUZ -----------
+  // =======================
+  // LDR
+  // =======================
   int luz = analogRead(ldrPin);
+  bool oscuro = (luz < thresholdValue);
 
-  bool oscuro = (luz < thresholdLuz);  // Valor bajo = oscuridad
+  Serial.print("Luz: ");
+  Serial.println(luz);
 
-  // LED azul indica oscuridad (activo en LOW)
-  digitalWrite(BLUE_LED, oscuro ? HIGH : LOW);
+  if (oscuro) digitalWrite(led, HIGH);
+  else digitalWrite(led, LOW);
 
-  bool cambioLuz = (oscuro != lastOscuro);
+  // Si cambia el estado de luz → enviar al servidor
+  if (oscuro != lastOscuro) {
+    String jsonLuz = "{";
+    jsonLuz += "\"value\": " + String(luz) + ",";
+    jsonLuz += "\"state\": " + String(oscuro ? 1 : 0);
+    jsonLuz += "}";
+    sendToServer("/iot/api/light/data", jsonLuz);
+    lastOscuro = oscuro;
+  }
 
 
-  // ----------- LED DE DISTANCIA (ROJO/VERDE) -----------
-  String ledDist = (dist >= 0 && dist <= 15) ? "rojo" : "verde";
+  // ============================
+  // Ultrasonico + LED RGB
+  // ============================
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(3);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
 
-  if (ledDist == "rojo") {
+  long duration = pulseIn(ECHO, HIGH, 30000);
+  float distance = duration * 0.034 / 2;
+
+  Serial.print("Distancia: ");
+  Serial.println(distance);
+
+  String distState = (distance <= 5 && duration != 0) ? "cerca" : "seguro";
+  int stateValue = (distState == "cerca") ? 1 : 0;
+
+//  if (duration == 0 || distance <= 0) {
+//    digitalWrite(RED_LED, LOW);
+//    digitalWrite(GREEN_LED, LOW);
+//    Serial.println("RGB APAGADO");
+//  } else if
+  if (distState == "cerca") {
     digitalWrite(RED_LED, HIGH);
     digitalWrite(GREEN_LED, LOW);
+    Serial.println("RGB: ROJO (muy cerca)");
   } else {
     digitalWrite(RED_LED, LOW);
     digitalWrite(GREEN_LED, HIGH);
+    Serial.println("RGB: VERDE (distancia segura)");
   }
 
-  bool cambioDist = (ledDist != lastLedDist);
-
-
-  // =====================================================
-  // ENVIAR EVENTO SI CAMBIÓ LUZ O DISTANCIA
-  // =====================================================
-  if (cambioLuz || cambioDist) {
-
-    if (cambioLuz) {
-      if (oscuro) Serial.println("🌑 EVENTO: Se hizo oscuro");
-      else        Serial.println("☀️ EVENTO: Se hizo iluminado");
-    }
-
-    sendJSON(dist, luz, oscuro, ledDist);
-
-    lastOscuro = oscuro;
-    lastLedDist = ledDist;
+  // Si cambia el estado de distancia → enviar al servidor
+  if (distState != lastDistState) {
+    String jsonDist = "{";
+    jsonDist += "\"value\": " + String(distance, 1) + ",";
+    jsonDist += "\"state\": " + String(stateValue);
+    jsonDist += "}";
+    sendToServer("/iot/api/distance/data", jsonDist);
+    lastDistState = distState;
   }
 
-  delay(100);
+  Serial.println("-------------------------");
+  delay(300);
 }
