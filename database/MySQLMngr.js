@@ -19,6 +19,8 @@
  */
 const mysql = require('mysql2/promise')
 const constants = require('../constants')
+const fs = require('fs');
+const path = require('path');
 
 const HOST =constants.dbHost;
 const PORT = constants.dbPort;
@@ -35,6 +37,13 @@ let pool = mysql.createPool({
   decimalNumbers:true,
   waitForConnections: true,
   connectionLimit: 10,
+  ssl: {
+    rejectUnauthorized: true,
+    ca: fs.readFileSync(path.join(__dirname, 'database/ca.pem')),
+    // Opcional: si también tienes certificado de cliente
+    // cert: fs.readFileSync(path.join(__dirname, '../certs/client-cert.pem')),
+    // key: fs.readFileSync(path.join(__dirname, '../certs/client-key.pem')),
+  }
 });;
 
 // Try a quick check to ensure the pool can get a connection and the DB is reachable.

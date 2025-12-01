@@ -1,10 +1,7 @@
 // DB configuration
-const dbHost = "localhost";
-const dbPort = "3306";
-const dbUser = "root";
-const dbPass = "M@rbell@1124";
+const dbPort = "18479";
 // Use the 'desktop' database for IoT desktop storage
-const dbName = "iot";
+const dbName = "defaultdb";
 
 //Server General Configuration
 const serverPort = 3000 
