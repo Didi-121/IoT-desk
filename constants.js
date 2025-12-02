@@ -33,16 +33,16 @@ const postDistanceData = '/distance/data';
 const getDistanceData = '/distance/data';
 
 // TIMER QUERIES
-const insertTimerTime = 'INSERT INTO timer (minutes, seconds, date) VALUES (?, ?, NOW())';
+const insertTimerTime = 'INSERT INTO timer (minutes, seconds) VALUES (?, ?)';
 const selectTimerData = 'SELECT * FROM timer';
 
 // BUTTON QUERIES
-const insertButtonState = 'INSERT INTO button (state, date) VALUES (?, NOW())';
+const insertButtonState = 'INSERT INTO button (state) VALUES (?)';
 const selectButtonData = 'SELECT * FROM button';
 
 // TEMPERATURE QUERIES
-const insertTemperatureData = 'INSERT INTO temperatura (value, state) VALUES (?, ?)';
-const selectTemperatureData = 'SELECT * FROM temperatura ORDER BY id DESC';
+const insertTemperatureData ='INSERT INTO temperatura (valor, estado) VALUES (?, ?)';
+const selectTemperatureData = 'SELECT * FROM temperature';
 
 // LIGHT QUERIES
 const insertLightValue = 'INSERT INTO light (value, state) VALUES (?, ?)';
