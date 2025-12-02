@@ -29,22 +29,20 @@ const PASS = constants.dbPass;
 const DB = constants.dbName;
 
 let pool = mysql.createPool({
-  host: HOST,//constants.dbHost,
-  user: USR,//The OS has a env variable called USER, causing an error on DB login.
-  port: PORT,//constants.dbPort,
-  password: PASS,//constants.dbPass,
-  database: DB,//constants.dbName,
+  host: HOST,
+  user: USR,
+  port: PORT,
+  password: PASS,
+  database: DB,
   decimalNumbers:true,
   waitForConnections: true,
   connectionLimit: 10,
   ssl: {
-    rejectUnauthorized: true,
-    ca: fs.readFileSync(path.join(__dirname, 'ca.pem')),
-    // Opcional: si también tienes certificado de cliente
-    // cert: fs.readFileSync(path.join(__dirname, '../certs/client-cert.pem')),
-    // key: fs.readFileSync(path.join(__dirname, '../certs/client-key.pem')),
+    rejectUnauthorized: false   // 👈 ignorar verificación estricta del certificado
+    // Puedes quitar el "ca" por ahora
+    // ca: fs.readFileSync(path.join(__dirname, 'ca.pem')),
   }
-});;
+});
 
 // Try a quick check to ensure the pool can get a connection and the DB is reachable.
 (async function checkConnection(){

@@ -86,43 +86,50 @@ async function getButtonData(req, res) {
 }
 
 //Endpoint 5: recibe datos del DH11
-async function insertTemperatureData(req, res){
-  try{
-    const serverTime = new Date().toISOString();
-    console.log(`[TEMPERATURE_DATA] Received at ${serverTime}`);
-    console.log('Payload:', req.body);
+async function insertTemperatureData(req, res) {
+    try {
+        const serverTime = new Date().toISOString();
+        console.log(`[TEMPERATURE_DATA] Received at ${serverTime}`);
+        console.log(' Payload:', req.body);
 
-    if (!req.body || req.body.temperature === undefined) {
-      return res.status(400).json({ error: "Missing temperature" });
+        const { temperature, estado } = req.body;
+
+        // Validación básica
+        if (temperature === undefined || estado === undefined) {
+            return res.status(400).json({ error: "Missing temperature or estado" });
+        }
+
+        // Mapeamos a los nombres de columnas de la tabla: value, state
+        const value = temperature;
+        const state = (estado === true || estado === 1) ? 1 : 0;
+
+        let query = constants.insertTemperatureData;
+        let params = [value, state];
+
+        const qResult = await mysql.insertData(query, params);
+        return res.status(200).json({ status: "ok", insert: qResult });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ status: "error", message: error.message });
     }
-
-    const temperature = req.body.temperature;
-    const estado = req.body.estado === true ? 1 : 0;
-
-    const query = constants.insertTemperatureData;
-    const params = [temperature, estado];  
-
-    const qResult = await mysql.insertData(query, params);
-    return res.status(200).json(qResult);
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({status: "error", message: error.message});
-  }
 }
 
 //Endpoint 6: obtiene datos del DH11
-async function getTemperatureData(req, res){
-    try{
+async function getTemperatureData(req, res) {
+    try {
         const serverTime = new Date().toISOString();
         console.log(`[GET_TEMPERATURE_DATA] Requested at ${serverTime}`);
 
-        let query = constants.selectTemperatureData;
+        // Consulta correcta a la tabla "temperatura"
+        const query = constants.selectTemperatureData;
+
         const qResult = await mysql.queryData(query, []);
-        res.status(200).json(qResult);
+        return res.status(200).json(qResult);
+
     } catch (error) {
         console.error(error);
-        res.status(500).json({status: "error", message: error.message});
+        return res.status(500).json({ status: "error", message: error.message });
     }
 }
 
