@@ -1,7 +1,10 @@
-// DB configuration
-const dbPort = "18479";
-// Use the 'desktop' database for IoT desktop storage
-const dbName = "defaultdb";
+//Database Configuration
+//.ENV file is used to store sensitive information like DB credentials
+const dbHost = process.env.DB_HOST || 'localhost';
+const dbUser = process.env.DB_USER || 'root';
+const dbPass = process.env.DB_PASS || 'password';
+const dbPort = process.env.DB_PORT || '3306';
+const dbName = process.env.DB_NAME || 'iot_database';
 
 //Server General Configuration
 const serverPort = 3000 
@@ -58,7 +61,7 @@ module.exports= {
    postDistanceData, getDistanceData,
    insertTimerTime, selectTimerData,
    insertButtonState, selectButtonData,
-   insertTemperatureDoata, selectTemperatureData,
+   insertTemperatureData, selectTemperatureData,
    insertLightValue, selectLightData,
    insertDistanceValue, selectDistanceData
 }

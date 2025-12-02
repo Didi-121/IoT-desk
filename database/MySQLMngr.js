@@ -39,7 +39,7 @@ let pool = mysql.createPool({
   connectionLimit: 10,
   ssl: {
     rejectUnauthorized: true,
-    ca: fs.readFileSync(path.join(__dirname, 'database/ca.pem')),
+    ca: fs.readFileSync(path.join(__dirname, 'ca.pem')),
     // Opcional: si también tienes certificado de cliente
     // cert: fs.readFileSync(path.join(__dirname, '../certs/client-cert.pem')),
     // key: fs.readFileSync(path.join(__dirname, '../certs/client-key.pem')),
