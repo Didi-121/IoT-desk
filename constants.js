@@ -41,8 +41,8 @@ const insertButtonState = 'INSERT INTO button (state) VALUES (?)';
 const selectButtonData = 'SELECT * FROM button';
 
 // TEMPERATURE QUERIES
-const insertTemperatureData ='INSERT INTO temperatura (valor, estado) VALUES (?, ?)';
-const selectTemperatureData = 'SELECT * FROM temperature';
+const insertTemperatureData = 'INSERT INTO temperatura (value, state) VALUES (?, ?)';
+const selectTemperatureData = 'SELECT * FROM temperatura ORDER BY id DESC';
 
 // LIGHT QUERIES
 const insertLightValue = 'INSERT INTO light (value, state) VALUES (?, ?)';
